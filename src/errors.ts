@@ -2,6 +2,7 @@ export interface LLMErrorOptions {
   status?: number;
   retryable?: boolean;
   provider?: string;
+  retryAfterMs?: number;
   cause?: unknown;
 }
 
@@ -9,6 +10,7 @@ export class LLMError extends Error {
   readonly status: number | undefined;
   readonly retryable: boolean;
   readonly provider: string | undefined;
+  readonly retryAfterMs: number | undefined;
 
   constructor(message: string, options: LLMErrorOptions = {}) {
     super(message, options.cause !== undefined ? { cause: options.cause } : undefined);
@@ -16,6 +18,7 @@ export class LLMError extends Error {
     this.status = options.status;
     this.retryable = options.retryable ?? false;
     this.provider = options.provider;
+    this.retryAfterMs = options.retryAfterMs;
   }
 }
 
