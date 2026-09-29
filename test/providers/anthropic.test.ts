@@ -108,4 +108,33 @@ describe("anthropic provider", () => {
     await expect(promise).rejects.toBeInstanceOf(LLMError);
     await expect(promise).rejects.toMatchObject({ retryable: true });
   });
+
+  it("streams text deltas parsed from SSE content_block_delta events", async () => {
+    const sse =
+      'event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"Hel"}}\n\n' +
+      'event: content_block_delta\ndata: {"type":"content_block_delta","delta":{"type":"text_delta","text":"lo"}}\n\n' +
+      'event: message_stop\ndata: {"type":"message_stop"}\n\n';
+    fetchMock.mockResolvedValueOnce(
+      new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } }),
+    );
+
+    const provider = anthropic({ apiKey: "key", model: "claude-sonnet-5" });
+    if (!provider.stream) {
+      throw new Error("provider.stream not implemented");
+    }
+
+    const chunks: string[] = [];
+    for await (const chunk of provider.stream({
+      messages: [{ role: "user", content: "hi" }],
+      signal: new AbortController().signal,
+    })) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toEqual(["Hel", "lo"]);
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(init.body as string) as Record<string, unknown>;
+    expect(body.stream).toBe(true);
+  });
 });

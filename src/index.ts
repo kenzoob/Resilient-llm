@@ -12,4 +12,8 @@ export type { OpenAIConfig } from "./providers/openai";
 export type { ChatMessage, Provider, ProviderCallOptions, ProviderResult } from "./providers/shared";
 export { resilientCall } from "./fallback";
 export type { ResilientCallOptions, ResilientCallResult, ResilientCallHooks } from "./fallback";
+export { parseSSE } from "./sse";
+export type { SSEEvent } from "./sse";
+export { streamText } from "./stream";
+export type { StreamTextOptions } from "./stream";
 

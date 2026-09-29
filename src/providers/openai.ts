@@ -1,3 +1,4 @@
+import { parseSSE } from "../sse";
 import { fetchJson, mapHttpError, type Provider, type ProviderCallOptions } from "./shared";
 
 export interface OpenAIConfig {
@@ -15,33 +16,48 @@ interface OpenAIResponse {
   choices: OpenAIChoice[];
 }
 
+interface OpenAIStreamChunk {
+  choices?: { delta?: { content?: string } }[];
+}
+
 const PROVIDER_NAME = "openai";
+
+function buildRequestInit(
+  config: OpenAIConfig,
+  messages: ProviderCallOptions["messages"],
+  signal: AbortSignal,
+  stream: boolean,
+): RequestInit {
+  const body: Record<string, unknown> = {
+    model: config.model,
+    messages: messages.map((message) => ({ role: message.role, content: message.content })),
+    stream,
+  };
+  if (config.maxTokens !== undefined) {
+    body.max_tokens = config.maxTokens;
+  }
+
+  return {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${config.apiKey}`,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(body),
+    signal,
+  };
+}
 
 export function openai(config: OpenAIConfig): Provider {
   const baseUrl = config.baseUrl ?? "https://api.openai.com";
+  const url = `${baseUrl}/v1/chat/completions`;
 
   return {
     name: PROVIDER_NAME,
     async call({ messages, signal }: ProviderCallOptions) {
-      const body: Record<string, unknown> = {
-        model: config.model,
-        messages: messages.map((message) => ({ role: message.role, content: message.content })),
-      };
-      if (config.maxTokens !== undefined) {
-        body.max_tokens = config.maxTokens;
-      }
-
       const response = await fetchJson(
-        `${baseUrl}/v1/chat/completions`,
-        {
-          method: "POST",
-          headers: {
-            authorization: `Bearer ${config.apiKey}`,
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(body),
-          signal,
-        },
+        url,
+        buildRequestInit(config, messages, signal, false),
         PROVIDER_NAME,
       );
 
@@ -53,6 +69,37 @@ export function openai(config: OpenAIConfig): Provider {
       const text = data.choices[0]?.message.content ?? "";
 
       return { text, provider: PROVIDER_NAME, raw: data };
+    },
+
+    async *stream({ messages, signal }: ProviderCallOptions) {
+      const response = await fetchJson(
+        url,
+        buildRequestInit(config, messages, signal, true),
+        PROVIDER_NAME,
+      );
+
+      if (!response.ok) {
+        throw await mapHttpError(response, PROVIDER_NAME);
+      }
+      if (!response.body) {
+        return;
+      }
+
+      for await (const event of parseSSE(response.body)) {
+        if (event.data.trim() === "[DONE]") {
+          return;
+        }
+        let payload: OpenAIStreamChunk;
+        try {
+          payload = JSON.parse(event.data) as OpenAIStreamChunk;
+        } catch {
+          continue;
+        }
+        const text = payload.choices?.[0]?.delta?.content;
+        if (text) {
+          yield text;
+        }
+      }
     },
   };
 }

@@ -86,4 +86,33 @@ describe("openai provider", () => {
     await expect(promise).rejects.toBeInstanceOf(LLMError);
     await expect(promise).rejects.toMatchObject({ retryable: true });
   });
+
+  it("streams text deltas parsed from SSE chunks until [DONE]", async () => {
+    const sse =
+      'data: {"choices":[{"delta":{"content":"Hel"}}]}\n\n' +
+      'data: {"choices":[{"delta":{"content":"lo"}}]}\n\n' +
+      "data: [DONE]\n\n";
+    fetchMock.mockResolvedValueOnce(
+      new Response(sse, { status: 200, headers: { "content-type": "text/event-stream" } }),
+    );
+
+    const provider = openai({ apiKey: "key", model: "gpt-4o" });
+    if (!provider.stream) {
+      throw new Error("provider.stream not implemented");
+    }
+
+    const chunks: string[] = [];
+    for await (const chunk of provider.stream({
+      messages: [{ role: "user", content: "hi" }],
+      signal: new AbortController().signal,
+    })) {
+      chunks.push(chunk);
+    }
+
+    expect(chunks).toEqual(["Hel", "lo"]);
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(init.body as string) as Record<string, unknown>;
+    expect(body.stream).toBe(true);
+  });
 });
