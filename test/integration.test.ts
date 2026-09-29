@@ -124,9 +124,7 @@ describe("integration: real HTTP, no mocked fetch", () => {
           return;
         }
         res.writeHead(200, { "content-type": "application/json" });
-        res.end(
-          JSON.stringify({ choices: [{ message: { role: "assistant", content: "ok" } }] }),
-        );
+        res.end(JSON.stringify({ choices: [{ message: { role: "assistant", content: "ok" } }] }));
       });
     });
     try {
