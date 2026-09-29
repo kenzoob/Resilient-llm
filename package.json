@@ -1,5 +1,5 @@
 {
-  "name": "@kenzoob/resilient-llm",
+  "name": "@kenzoobryan27/resilient-llm",
   "version": "0.1.0",
   "description": "Make LLM API calls production-ready: timeouts, retries with backoff and jitter, circuit breakers, provider fallback and SSE streaming. Zero runtime dependencies.",
   "type": "module",

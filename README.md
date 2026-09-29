@@ -1,7 +1,7 @@
 # resilient-llm
 
 ![CI](https://github.com/kenzoob/Resilient-llm/actions/workflows/ci.yml/badge.svg)
-![npm](https://img.shields.io/npm/v/@kenzoob/resilient-llm)
+![npm](https://img.shields.io/npm/v/@kenzoobryan27/resilient-llm)
 
 Make LLM API calls production-ready: timeouts, retries with backoff and jitter, circuit breakers, provider fallback and SSE streaming. Zero runtime dependencies.
 
@@ -14,13 +14,13 @@ LLM APIs fail in predictable ways: rate limits (429), temporary outages (5xx) an
 ## Install
 
 ```bash
-npm install @kenzoob/resilient-llm
+npm install @kenzoobryan27/resilient-llm
 ```
 
 ## Quick start
 
 ```ts
-import { resilientCall, anthropic, openai } from "@kenzoob/resilient-llm";
+import { resilientCall, anthropic, openai } from "@kenzoobryan27/resilient-llm";
 
 const result = await resilientCall({
   providers: [
@@ -45,7 +45,7 @@ Model names change often: keep them in environment variables, never hardcoded.
 ### Streaming
 
 ```ts
-import { anthropic, streamText } from "@kenzoob/resilient-llm";
+import { anthropic, streamText } from "@kenzoobryan27/resilient-llm";
 
 const provider = anthropic({ apiKey: process.env.ANTHROPIC_API_KEY!, model: process.env.ANTHROPIC_MODEL! });
 const controller = new AbortController();
