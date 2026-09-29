@@ -19,6 +19,7 @@ export interface ProviderResult {
 export interface Provider {
   name: string;
   call: (options: ProviderCallOptions) => Promise<ProviderResult>;
+  stream?: (options: ProviderCallOptions) => AsyncGenerator<string, void, unknown>;
 }
 
 interface ErrorBody {
