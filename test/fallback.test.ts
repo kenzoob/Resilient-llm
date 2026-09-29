@@ -75,9 +75,9 @@ describe("resilientCall", () => {
     const p2Call = vi.fn<Provider["call"]>();
     const p2 = fakeProvider("p2", p2Call);
 
-    await expect(
-      resilientCall({ ...baseOptions, providers: [p1, p2] }),
-    ).rejects.toMatchObject({ status: 400 });
+    await expect(resilientCall({ ...baseOptions, providers: [p1, p2] })).rejects.toMatchObject({
+      status: 400,
+    });
     expect(p2Call).not.toHaveBeenCalled();
   });
 
@@ -95,9 +95,10 @@ describe("resilientCall", () => {
       breaker: { failureThreshold: 1, resetTimeoutMs: 1000 },
     };
 
-    await expect(
-      resilientCall({ ...openBreakerOptions, providers: [p1, p2] }),
-    ).resolves.toEqual({ text: "from p2", provider: "p2" });
+    await expect(resilientCall({ ...openBreakerOptions, providers: [p1, p2] })).resolves.toEqual({
+      text: "from p2",
+      provider: "p2",
+    });
 
     const p1CallSpy = vi.fn<Provider["call"]>(p1.call);
     p1.call = p1CallSpy;

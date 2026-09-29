@@ -38,11 +38,9 @@ export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions):
       }
 
       const llmError = error as LLMError;
-      const rawDelay = llmError.retryAfterMs ?? calculateBackoffMs(
-        attempt,
-        options.baseDelayMs,
-        options.maxDelayMs,
-      );
+      const rawDelay =
+        llmError.retryAfterMs ??
+        calculateBackoffMs(attempt, options.baseDelayMs, options.maxDelayMs);
       const delayMs = Math.min(rawDelay, options.maxDelayMs);
 
       attempt += 1;

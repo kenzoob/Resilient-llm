@@ -23,24 +23,16 @@ describe("LLMError", () => {
 
 describe("isRetryable", () => {
   it("returns true for a 429", () => {
-    expect(isRetryable(new LLMError("rate limited", { status: 429, retryable: true }))).toBe(
-      true,
-    );
+    expect(isRetryable(new LLMError("rate limited", { status: 429, retryable: true }))).toBe(true);
   });
 
   it("returns true for 500-599", () => {
-    expect(isRetryable(new LLMError("server error", { status: 503, retryable: true }))).toBe(
-      true,
-    );
-    expect(isRetryable(new LLMError("server error", { status: 599, retryable: true }))).toBe(
-      true,
-    );
+    expect(isRetryable(new LLMError("server error", { status: 503, retryable: true }))).toBe(true);
+    expect(isRetryable(new LLMError("server error", { status: 599, retryable: true }))).toBe(true);
   });
 
   it("returns false for a 400", () => {
-    expect(isRetryable(new LLMError("bad request", { status: 400, retryable: false }))).toBe(
-      false,
-    );
+    expect(isRetryable(new LLMError("bad request", { status: 400, retryable: false }))).toBe(false);
   });
 
   it("returns false for a 401", () => {

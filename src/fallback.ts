@@ -45,9 +45,7 @@ function getBreaker(
   return breaker;
 }
 
-export async function resilientCall(
-  options: ResilientCallOptions,
-): Promise<ResilientCallResult> {
+export async function resilientCall(options: ResilientCallOptions): Promise<ResilientCallResult> {
   let lastError: unknown = new LLMError("No providers configured", { retryable: false });
 
   for (let i = 0; i < options.providers.length; i++) {

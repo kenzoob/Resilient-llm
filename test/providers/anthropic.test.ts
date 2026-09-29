@@ -25,9 +25,7 @@ describe("anthropic provider", () => {
   });
 
   it("sends the expected request shape and returns the text", async () => {
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse({ content: [{ type: "text", text: "hello" }] }),
-    );
+    fetchMock.mockResolvedValueOnce(jsonResponse({ content: [{ type: "text", text: "hello" }] }));
 
     const provider = anthropic({ apiKey: "key", model: "claude-sonnet-5" });
     const controller = new AbortController();
