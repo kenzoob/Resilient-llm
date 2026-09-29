@@ -1,8 +1,8 @@
 export interface LLMErrorOptions {
-  status?: number;
-  retryable?: boolean;
-  provider?: string;
-  retryAfterMs?: number;
+  status?: number | undefined;
+  retryable?: boolean | undefined;
+  provider?: string | undefined;
+  retryAfterMs?: number | undefined;
   cause?: unknown;
 }
 
