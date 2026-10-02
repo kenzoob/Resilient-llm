@@ -1,6 +1,6 @@
 {
   "name": "@kenzoobryan27/resilient-llm",
-  "version": "1.2.0",
+  "version": "0.1.2",
   "description": "Make LLM API calls production-ready: timeouts, retries with backoff and jitter, circuit breakers, provider fallback and SSE streaming. Zero runtime dependencies.",
   "type": "module",
   "main": "./dist/index.cjs",
