@@ -273,8 +273,6 @@ anthropic({ apiKey, model, baseUrl: "https://my-proxy.internal" });
 - **Why no official SDK** — fewer dependencies to audit and update, full control over error mapping and streaming, and both APIs only need `fetch` and a JSON body.
 - **Why a non-retryable error skips fallback** — a 400 or 401 usually means the request itself (or the credentials) is wrong, not that the provider is down. Retrying it on a different provider would just fail again and hide the real bug.
 
-See [SPEC.md](SPEC.md) for the original build spec, checklists and step-by-step plan this library was built from.
-
 ## Testing this library
 
 Two layers of tests back this package:
